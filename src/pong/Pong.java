@@ -43,9 +43,6 @@ public class Pong extends JPanel
         start.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         start.setBounds(200, 50, 900, 600);
         
-        
-
-        
         JButton howTo = new JButton("How To Play");
         howTo.setBounds(350, 310, 160, 40);
         startCon.add(howTo);
@@ -122,16 +119,11 @@ public class Pong extends JPanel
         g.drawRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
         g.fillRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
     
-
-        
         if(startGame)
         {
             g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
             g.drawString("press Space to start", 350, 240);
         }
-        
-
-        
         
         else if(gameOver && lives <= 0)
         {
@@ -243,8 +235,7 @@ public class Pong extends JPanel
                     gameOver = true;
                 }
 
-                
-                
+                      
                 try 
                 {
                     Thread.sleep(15);
