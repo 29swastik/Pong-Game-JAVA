@@ -13,8 +13,21 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import static pong.Pong.ballWidth;
+import static pong.Pong.ballX;
+import static pong.Pong.ballY;
+import static pong.Pong.dx;
+import static pong.Pong.dy;
+import static pong.Pong.flag;
+import static pong.Pong.frame;
+import static pong.Pong.gameOver;
+import static pong.Pong.paddle2X;
+import static pong.Pong.paddle2Y;
+import static pong.Pong.paddleHeight;
+import static pong.Pong.paddleY;
+import static pong.Pong.score;
+
 
 public class Pong extends JPanel 
 {
@@ -26,13 +39,13 @@ public class Pong extends JPanel
     Container con = null;
     Container startCon = null;
     public static int paddleX = 10, paddleY = 270, paddleWidth = 10, paddleHeight = 100;
-    public static int paddle2X = 865, paddle2Y = 270;
+    public static int paddle2X = 864, paddle2Y = 270;
     public static int upSpeed = 15;
     public static int downSpeed = 15;
     public static int ballX, ballY, ballWidth = 25, ballHeight = 25;
     public static int dx = 3, dy = 3;
     public static int x = 0;
-    public static boolean flag = false, gameOver = false, howToFlag = false, startGame = true;
+    public static boolean flag = false, gameOver = false, howToFlag = false, startGame = true, startButtonClicked;
     public static int lives = 3, score = 0;
 
     public void creatWindow() 
@@ -79,10 +92,6 @@ public class Pong extends JPanel
         con.setFocusable(true);
         con.addKeyListener(new classKeyEvents());
 
-        Runnable ml = new mainLoop();
-        Thread th = new Thread(ml);
-        th.start();
-
     }
 
     protected void paintComponent(Graphics g) 
@@ -90,6 +99,14 @@ public class Pong extends JPanel
         super.paintComponent(g);
         g.setColor(Color.darkGray);
         g.fillRect(0, 0, getWidth(), getHeight());
+   
+        g.setColor(Color.YELLOW);
+        g.drawRect(paddleX, paddleY, paddleWidth, paddleHeight);
+        g.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+
+        g.setColor(Color.white);
+        g.drawRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
+        g.fillRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
 
         if(gameOver && --lives > 0)
         {
@@ -100,7 +117,7 @@ public class Pong extends JPanel
 
         if (!flag) 
         {
-            ballX = paddleX + 10;
+            ballX = 20;
             ballY = paddleY + 35;
             g.setColor(Color.red);
             g.fillOval(ballX, ballY, ballWidth, ballHeight);
@@ -110,18 +127,11 @@ public class Pong extends JPanel
             g.setColor(Color.red);
             g.fillOval(ballX + dx, ballY + dy, ballWidth, ballHeight);
         }
-        
-        g.setColor(Color.YELLOW);
-        g.drawRect(paddleX, paddleY, paddleWidth, paddleHeight);
-        g.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
 
-        g.setColor(Color.white);
-        g.drawRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
-        g.fillRect(paddle2X, paddle2Y, paddleWidth, paddleHeight);
-    
         if(startGame)
         {
             g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+            g.setColor(Color.WHITE);
             g.drawString("press Space to start", 350, 240);
         }
         
@@ -138,9 +148,10 @@ public class Pong extends JPanel
         }
         
         g.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+        g.setColor(Color.WHITE);
         g.drawString("Lives :   " + lives, 570, 30);
         g.drawString("Score :   " + score, 200, 30);
-
+ 
     }
 
     static class classKeyEvents implements KeyListener
@@ -191,65 +202,10 @@ public class Pong extends JPanel
                 }
 
             }
-            
-            Pong.frame.repaint();
 
         }
 
         public void keyReleased(KeyEvent e) { }
-
-    }
-
-    class mainLoop implements Runnable 
-    {
-
-        public void run()
-        {
-            while (true) 
-            {
-                ballX += dx;
-                ballY += dy;
-
-                if (ballY > 530) 
-                {
-                    dy = -dy;
-                } 
-                else if (ballY < 20) 
-                {
-                    dy = Math.abs(dy);
-                }
-
-                if (ballX <= 20 && ballX > 0 && ballY >= paddleY && ballY <= paddleY + paddleHeight)
-                {
-                    dx = Math.abs(dx);
-                    if(flag)score++;
-                } 
-                else if (ballX == 842 && ballX < 845 && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) 
-                {
-                    dx = -dx;
-                    if(flag)score++;
-                } 
-                else if (ballX <= 0 || ballX > 842) 
-                {
-
-                    gameOver = true;
-                }
-
-                      
-                try 
-                {
-                    Thread.sleep(15);
-                } 
-                catch (InterruptedException ex) 
-                {
-                    Logger.getLogger(Pong.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                frame.repaint();
-
-            }
-
-        }
 
     }
 
@@ -262,6 +218,60 @@ public class Pong extends JPanel
 
 }
 
+class mainLoop implements Runnable 
+{
+
+    public void run()
+    {
+        while (true) 
+        {
+            ballX += dx;
+            ballY += dy;
+
+            if (ballY > 530) 
+            {
+                dy = -dy;
+            } 
+            else if (ballY < 20) 
+            {
+                dy = Math.abs(dy);
+            }
+
+            if (ballX == 20 && ballX > 0 && ballY >= paddleY && ballY <= paddleY + paddleHeight )
+            {
+                dx = Math.abs(dx);
+                if(flag)score++;
+            } 
+            else if (ballX+ballWidth == paddle2X && ballY >= paddle2Y && ballY <= paddle2Y + paddleHeight) 
+            {
+                dx = -dx;
+                if(flag)score++;
+            } 
+            else if (ballX <= 0 || ballX+ballWidth > paddle2X) 
+            {
+                gameOver = true;
+                dx = Math.abs(dx);
+            }
+
+
+            frame.repaint();
+            try 
+            {
+                Thread.sleep(15);
+            } 
+            catch (InterruptedException ex) 
+            {
+                Logger.getLogger(Pong.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+
+
+
+        }
+
+    }
+
+}
 
 class handleButton implements ActionListener
 {
@@ -270,6 +280,9 @@ class handleButton implements ActionListener
     {
         if(e.getActionCommand().equals("Start"))
         {
+            Runnable ml = new mainLoop();
+            Thread th = new Thread(ml);
+            th.start();
             Pong.start.setVisible(false);
             Pong.frame.setVisible(true);
         }
@@ -277,16 +290,19 @@ class handleButton implements ActionListener
         else if(e.getActionCommand().equals("How To Play"))
         {
             if(Pong.howToFlag == false)
-            Pong.text.setVisible(true);
+            {
+                Pong.howToFlag = true;
+                Pong.text.setVisible(true);
+            }
             
-            if(Pong.howToFlag)
+            else if(Pong.howToFlag)
             {
                 Pong.text.setVisible(false);
                 Pong.howToFlag = false;
             }
-            else
-                Pong.howToFlag = true;
+                
         }
     }
     
 }
+
