@@ -154,7 +154,7 @@ public class Pong extends JPanel
  
     }
 
-    static class classKeyEvents implements KeyListener
+    class classKeyEvents implements KeyListener
     {
 
         public void keyTyped(KeyEvent e) {}
